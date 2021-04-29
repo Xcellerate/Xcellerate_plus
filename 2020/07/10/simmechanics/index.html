@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="generator" content="Hexo 4.2.0"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>三自由度机械臂运动仿真 - Xcellerate+</title><meta description="在MATLAB&amp;#x2F;SimMechanics环境下，实现对三自由度机械臂运动的连续轨迹控制。"><meta property="og:type" content="blog"><meta property="og:title" content="三自由度机械臂运动仿真"><meta property="og:url" content="x-plus.xyz/2020/07/10/simmechanics/"><meta property="og:site_name" content="Xcellerate+"><meta property="og:description" content="在MATLAB&amp;#x2F;SimMechanics环境下，实现对三自由度机械臂运动的连续轨迹控制。"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://s1.ax1x.com/2020/07/10/UKE3jO.png"><meta property="og:image" content="https://s1.ax1x.com/2020/07/10/UKZXjK.png"><meta property="og:image" content="https://s1.ax1x.com/2020/07/10/UKEUUA.png"><meta property="og:image" content="https://s1.ax1x.com/2020/07/10/UKEYHH.png"><meta property="og:image" content="https://s1.ax1x.com/2020/07/10/UMFYw9.png"><meta property="og:image" content="https://s1.ax1x.com/2020/07/10/UMFUF1.gif"><meta property="og:image" content="https://s1.ax1x.com/2020/07/10/UKEa4I.jpg"><meta property="og:image" content="https://s1.ax1x.com/2020/07/10/UKENEd.png"><meta property="article:published_time" content="2020-07-10T06:03:53.000Z"><meta property="article:modified_time" content="2020-07-10T11:47:53.983Z"><meta property="article:author" content="Yinhao Zheng"><meta property="article:tag" content="技术"><meta property="twitter:card" content="summary"><meta property="twitter:image" content="https://s1.ax1x.com/2020/07/10/UKE3jO.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"x-plus.xyz/2020/07/10/simmechanics/"},"headline":"Xcellerate+","image":["https://s1.ax1x.com/2020/07/10/UKE3jO.png","https://s1.ax1x.com/2020/07/10/UKZXjK.png","https://s1.ax1x.com/2020/07/10/UKEUUA.png","https://s1.ax1x.com/2020/07/10/UKEYHH.png","https://s1.ax1x.com/2020/07/10/UMFYw9.png","https://s1.ax1x.com/2020/07/10/UMFUF1.gif","https://s1.ax1x.com/2020/07/10/UKEa4I.jpg","https://s1.ax1x.com/2020/07/10/UKENEd.png"],"datePublished":"2020-07-10T06:03:53.000Z","dateModified":"2020-07-10T11:47:53.983Z","author":{"@type":"Person","name":"Yinhao Zheng"},"description":"在MATLAB&#x2F;SimMechanics环境下，实现对三自由度机械臂运动的连续轨迹控制。"}</script><link rel="canonical" href="x-plus.xyz/2020/07/10/simmechanics/"><link rel="icon" href="/img/favicon.svg"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css"><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="Xcellerate+" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">Home</a><a class="navbar-item" href="/archives">Archives</a><a class="navbar-item" href="/categories">Categories</a><a class="navbar-item" href="/tags">Tags</a><a class="navbar-item" href="/about">About</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Zhihu" href="https://www.zhihu.com/people/zheng-yin-hao-28"><i class="fab fa-quora"></i></a><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a><a class="navbar-item is-hidden-tablet catalogue" title="目录" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta size-small is-uppercase level is-mobile"><div class="level-left"><time class="level-item" dateTime="2020-07-10T06:03:53.000Z" title="2020-07-10T06:03:53.000Z">2020-07-10</time><span class="level-item"><a class="link-muted" href="/categories/%E5%8E%9F%E5%88%9B%E6%96%87%E7%AB%A0/">原创文章</a></span><span class="level-item">9 分钟 读完 (大约 1333 个字)</span></div></div><h1 class="title is-3 is-size-4-mobile">三自由度机械臂运动仿真</h1><div class="content"><p>在MATLAB/SimMechanics环境下，实现对三自由度机械臂运动的连续轨迹控制。</p>
+<!DOCTYPE html>
+<html lang="en">
+    <body>
+        <div align=center>
+        <img src="https://s1.ax1x.com/2020/07/10/UKE3jO.png" alt=" " style="zoom:80%;" >
+        </div>
+    </body>
+</html>
+
+<a id="more"></a>
+
+<h2 id="题设条件"><a href="#题设条件" class="headerlink" title="题设条件"></a>题设条件</h2><ul>
+<li><p>机械臂的三个关节均为转动副，初始时刻第一个转动副轴线沿基础坐标系Z轴，其余两个转动副轴线沿X轴。</p>
+<!DOCTYPE html>
+<html lang="en">
+    <body>
+        <div align=center>
+        <img src="https://s1.ax1x.com/2020/07/10/UKZXjK.png" alt=" " style="zoom:80%;" >
+        </div>
+    </body>
+</html>
+</li>
+<li><p>机械臂杆件结构参数自定，三维模型需包含关节与末端执行器的细节。</p>
+</li>
+<li><p>机械臂初始时刻姿态自定，运动开始后5s内末端执行器沿直线运动到[x,y,z]，5s后停留在目标点。</p>
+</li>
+</ul>
+<h2 id="求解运动方程"><a href="#求解运动方程" class="headerlink" title="求解运动方程"></a>求解运动方程</h2><p>机械臂运动由三个转动副的转角控制，q1为杆件1绕Z轴的转角，q2/q3则为杆件2/3绕前一杆件的转角（注意它们并非杆件与水平面的夹角）。</p>
+<p>根据几何关系列出目标点坐标[x,y,z]与[q1,q2,q3]之间的方程：</p>
+<blockquote>
+<p>x=sinq1(L2cos(pi/2+q2)+L3cos(pi/2+q2+q3));</p>
+<p>y=cosq1(L2cos(pi/2+q2)+L3cos(pi/2+q2+q3));</p>
+<p>z=L1+L2sin(pi/2+q2)+L3(pi/2+q2+q3);</p>
+</blockquote>
+<p>通过MATLAB符号计算可对上述方程进行运动学反解，但三元方程无法直接求解，需要稍微改动一下：</p>
+<blockquote>
+<p>syms L1 L2 L3 q1 q2 q3 x y z u v</p>
+<p>% It just works</p>
+<p>q1=-atan2(x,y);</p>
+<p>% u=x/sin(q1);</p>
+<p>% v=z-L1;</p>
+<p>eqn1= -L2*cos(q2)-L3 *cos(q2+q3)==u;</p>
+<p>eqn2= L2*sin(q2)+L3 *sin(q2+q3)==v;</p>
+<p>[qs2,qs3]=solve(eqn1,eqn2,q2,q3);</p>
+</blockquote>
+<p>[q2,q3]有两组解，选一组代入运动控制函数中：</p>
+<blockquote>
+<p>function [q1,q2,q3] = fcn(x,y,z)</p>
+<p>L1=1.3; L2=1; L3=0.5; </p>
+<p>u=x/sin(q1); v=z-L1;</p>
+<p>q1=-atan2(x,y); </p>
+<p>q2=2* atan((2* L2* v - (L2^2* ((- L2^2 + 2* L2* L3 - L3^2 + u^2 + v^2)* (L2^2 + 2* L2* L3 + L3^2 - u^2 - v^2))^(1/2))/(- L2^2 + 2* L2* L3 - L3^2 + u^2 + v^2) - (L3^2* ((- L2^2 + 2* L2* L3 - L3^2 + u^2 + v^2)* (L2^2 + 2* L2* L3 + L3^2 - u^2 - v^2))^(1/2))/(- L2^2 + 2* L2* L3 - L3^2 + u^2 + v^2) + (u^2* ((- L2^2 + 2* L2* L3 - L3^2 + u^2 + v^2)* (L2^2 + 2* L2* L3 + L3^2 - u^2 - v^2))^(1/2))/(- L2^2 + 2* L2* L3 - L3^2 + u^2 + v^2) + (v^2* ((- L2^2 + 2* L2* L3 - L3^2 + u^2 + v^2)* (L2^2 + 2* L2* L3 + L3^2 - u^2 - v^2))^(1/2))/(- L2^2 + 2* L2* L3 - L3^2 + u^2 + v^2) + (2* L2* L3* ((- L2^2 + 2* L2* L3 - L3^2 + u^2 + v^2)* (L2^2 + 2* L2* L3 + L3^2 - u^2 - v^2))^(1/2))/(- L2^2 + 2* L2* L3 - L3^2 + u^2 + v^2))/(L2^2 - 2* L2* u - L3^2 + u^2 + v^2));</p>
+<p>q3=-2* atan(((- L2^2 + 2* L2* L3 - L3^2 + u^2 + v^2)* (L2^2 + 2* L2* L3 + L3^2 - u^2 - v^2))^(1/2)/(- L2^2 + 2* L2* L3 - L3^2 + u^2 + v^2));</p>
+<p>end</p>
+</blockquote>
+<h2 id="杆件结构参数"><a href="#杆件结构参数" class="headerlink" title="杆件结构参数"></a>杆件结构参数</h2><!DOCTYPE html>
+<html lang="en">
+    <body>
+        <div align=center>
+        <img src="https://s1.ax1x.com/2020/07/10/UKEUUA.png" alt=" " style="zoom:80%;" >
+        </div>
+    </body>
+</html>
+
+<p>杆件的长度分别为L1=1.3m，L2=1m，L3=0.5m，横截面积为0.1m*0.1m。初始时刻杆件2与杆件3沿Y轴正方向伸直，与杆件1成90°夹角。</p>
+<p>关节实际上是与转动副轴线重合的圆柱体，其长度略大于杆件宽度。末端执行器为长方体+圆柱体组成的滚轮结构，它的质心与杆件3的末端重合。这些附属部分对运动仿真的结果没有影响，建模时质量最好设为0。</p>
+<h2 id="SimMechanics仿真模块"><a href="#SimMechanics仿真模块" class="headerlink" title="SimMechanics仿真模块"></a>SimMechanics仿真模块</h2><!DOCTYPE html>
+<html lang="en">
+    <body>
+        <div align=center>
+        <img src="https://s1.ax1x.com/2020/07/10/UKEYHH.png" alt=" " style="zoom:80%;" >
+        </div>
+    </body>
+</html>
+
+<p>确定核心参数之后，就可以在Simulink中搭建仿真模型了，大致分为六个模块：</p>
+<ol>
+<li><p>设立基准坐标（World Frame）、重力加速度、求解精度等基础参数。本次仿真使用的求解器为ode113（Adams）</p>
+</li>
+<li><p>通过Solid元件建立杆件及其附属的模型，并通过刚体坐标变换相连，详细参数见下表：</p>
+<!DOCTYPE html>
+<html lang="en">
+    <body>
+        <div align=center>
+        <img src="https://s1.ax1x.com/2020/07/10/UMFYw9.png" alt=" " style="zoom:80%;" >
+        </div>
+    </body>
+</html>
+</li>
+<li><p>题设要求输入时变信号。假设[x,y,z]与时间u之间为一次线性关系，根据目标点初始坐标[0,1.5,1.3]与最终坐标[0.3,0.5,1.2]，可分别解出三个输入方程。再适当添加时钟等元件，构造符合题设的输入效果。</p>
+<p>（注意初始坐标极有可能是无法求解的奇异点，可采用[0.001,1.499,1.3]等近似替代）</p>
+</li>
+<li><p>添加上文提到的运动控制函数，将输入的[x,y,z]转化成[q1,q2,q3].</p>
+</li>
+<li><p>控制函数元件可直接与各转动副相连，但是这样运动轨迹偏差会很大。因此需要在中间插入一个PID控制器，转角经其输入转动副，再从转动副引出至比较器，形成负反馈控制。参数如下：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th align="center">Proportional</th>
+<th align="center">Integral</th>
+<th align="center">Derivative</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>转动副1</td>
+<td align="center">12000</td>
+<td align="center">6000</td>
+<td align="center">8000</td>
+</tr>
+<tr>
+<td>转动副2</td>
+<td align="center">900</td>
+<td align="center">750</td>
+<td align="center">1000</td>
+</tr>
+<tr>
+<td>转动副3</td>
+<td align="center">750</td>
+<td align="center">375</td>
+<td align="center">500</td>
+</tr>
+</tbody></table>
+<p>实验证明，PID参数较大时仿真结果线性度较高。</p>
+</li>
+<li><p>最后将杆件3末端与坐标变换传感器相连，通过示波器或者XY Graph观测仿真过程中目标点坐标的详细变化。</p>
+</li>
+</ol>
+<h2 id="运动仿真结果"><a href="#运动仿真结果" class="headerlink" title="运动仿真结果"></a>运动仿真结果</h2><p>10s内的运动仿真动画：</p>
+<!DOCTYPE html>
+<html lang="en">
+    <body>
+        <div align=center>
+        <img src="https://s1.ax1x.com/2020/07/10/UMFUF1.gif" alt=" " style="zoom:100%;" >
+        </div>
+    </body>
+</html>
+
+<p>观测整个运动过程中的坐标变化，可以看出题设条件（终点位置、沿直线运动、5秒时切换运动模式）均已满足。</p>
+<!DOCTYPE html>
+<html lang="en">
+    <body>
+        <div align=center>
+        <img src="https://s1.ax1x.com/2020/07/10/UKEa4I.jpg" alt="示波器" style="zoom:80%;" >
+        </div>
+    </body>
+</html>
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+    <body>
+        <div align=center>
+        <img src="https://s1.ax1x.com/2020/07/10/UKENEd.png" alt="XY Graph" style="zoom:80%;" >
+        </div>
+    </body>
+</html>
+
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>文中所述的机械臂仿真是卜王辉老师《MATLAB基础及工程应用》的期末大作业。这学期不仅系统地学习了SimMechanics的用法，还顺便温习了机械原理、自动控制原理的相关知识，最终由一项综合性较强的任务收尾，可谓不虚此行。比较遗憾的是未能成功从SolidWorks导入自建模型进行仿真，希望以后能想出解决办法。</p>
+<br/>
+
+<p><a href="http://xcellerate.ys168.com/">点此下载所需工程文件，密码：matlab</a></p>
+<br/></div><div class="article-tags size-small is-uppercase mb-4"><span class="mr-2">#</span><a class="link-muted mr-2" rel="tag" href="/tags/%E6%8A%80%E6%9C%AF/">技术</a></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/css/share.min.css"><div class="social-share"></div><script src="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/js/social-share.min.js"></script></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">喜欢这篇文章？打赏一下作者吧</h3><div class="buttons is-centered"><a class="button is-success donate"><span class="icon is-small"><i class="fab fa-weixin"></i></span><span>微信</span><span class="qrcode"><img src="/gallery/donate.jpg" alt="微信"></span></a></div></div></div><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="/2020/08/11/Yingdi_ma/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">驳北宸“禁马令”</span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2020/07/01/PMunite/"><span class="level-item">如何评价宝可梦大集结（Pokemon Unite）？</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><div class="card"><div class="card-content"><h3 class="title is-5">评论</h3><div class="content" id="valine-thread"></div><script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script><script src="https://cdn.jsdelivr.net/npm/valine@1.3.10/dist/Valine.min.js"></script><script>new Valine({
+            el: '#valine-thread' ,
+            notify: undefined,
+            verify: undefined,
+            appId: '0lUNpqeR9nB21Ig1vQBpB9oR-gzGzoHsz',
+            appKey: 'IKRgRrOscTOuNpKczswWW8EE',
+            placeholder: 'Say something please~',
+            avatar: 'mm',
+            avatarForce: false,
+            meta: ["nick","mail","link"],
+            pageSize: 10,
+            visitor: false,
+            highlight: true,
+            recordIP: false
+        });</script></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1"><div class="card widget"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="" src="/img/avatar.png" alt="Yinhao Zheng"></figure><p class="title is-size-4 is-block line-height-inherit">Yinhao Zheng</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>TU Huangdu</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives"><p class="title">37</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories"><p class="title">6</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags"><p class="title">11</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="/about/" target="_blank" rel="noopener">关注我</a></div></div></div><div class="card widget"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/404/"><span class="tag">404</span><span class="tag is-grey-lightest">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/ACG%E6%9D%82%E8%B0%88/"><span class="tag">ACG杂谈</span><span class="tag is-grey-lightest">7</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%85%AC%E5%91%8A/"><span class="tag">公告</span><span class="tag is-grey-lightest">4</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%A4%B1%E6%95%88/"><span class="tag">失效</span><span class="tag is-grey-lightest">5</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%AE%9D%E5%8F%AF%E6%A2%A6/"><span class="tag">宝可梦</span><span class="tag is-grey-lightest">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%89%A9%E5%B1%95/"><span class="tag">扩展</span><span class="tag is-grey-lightest">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%8A%80%E6%9C%AF/"><span class="tag">技术</span><span class="tag is-grey-lightest">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%96%87%E8%89%BA%E5%A4%8D%E5%85%B4/"><span class="tag">文艺复兴</span><span class="tag is-grey-lightest">2</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%97%B6%E6%94%BF/"><span class="tag">时政</span><span class="tag is-grey-lightest">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%82%89%E7%9F%B3%E4%BC%A0%E8%AF%B4/"><span class="tag">炉石传说</span><span class="tag is-grey-lightest">10</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%94%9F%E6%B4%BB/"><span class="tag">生活</span><span class="tag is-grey-lightest">8</span></a></div></div></div></div></div><div class="card widget"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile is-marginless" href="/categories/%E5%85%AC%E5%91%8A/"><span class="level-start"><span class="level-item">公告</span></span><span class="level-end"><span class="level-item tag">4</span></span></a></li><li><a class="level is-mobile is-marginless" href="/categories/%E5%85%B6%E4%BB%96%E6%8A%95%E7%A8%BF/"><span class="level-start"><span class="level-item">其他投稿</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/categories/%E5%8E%9F%E5%88%9B%E6%96%87%E7%AB%A0/"><span class="level-start"><span class="level-item">原创文章</span></span><span class="level-end"><span class="level-item tag">7</span></span></a></li><li><a class="level is-mobile is-marginless" href="/categories/%E5%8E%9F%E5%88%9B%E8%A7%86%E9%A2%91/"><span class="level-start"><span class="level-item">原创视频</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/categories/%E7%9F%A5%E4%B9%8E%E5%9B%9E%E7%AD%94/"><span class="level-start"><span class="level-item">知乎回答</span></span><span class="level-end"><span class="level-item tag">19</span></span></a></li><li><a class="level is-mobile is-marginless" href="/categories/%E7%9F%A5%E4%B9%8E%E6%96%87%E7%AB%A0/"><span class="level-start"><span class="level-item">知乎文章</span></span><span class="level-end"><span class="level-item tag">5</span></span></a></li></ul></div></div></div><div class="card widget"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content size-small"><p><time dateTime="2021-04-29T03:40:00.000Z">2021-04-29</time></p><p class="title is-6"><a class="link-muted" href="/2021/04/29/gallery/">画廊</a></p><p class="is-uppercase"><a class="link-muted" href="/categories/%E5%85%AC%E5%91%8A/">公告</a></p></div></article><article class="media"><div class="media-content size-small"><p><time dateTime="2021-04-29T02:34:11.000Z">2021-04-29</time></p><p class="title is-6"><a class="link-muted" href="/2021/04/29/log/">更新日志</a></p><p class="is-uppercase"><a class="link-muted" href="/categories/%E5%85%AC%E5%91%8A/">公告</a></p></div></article><article class="media"><div class="media-content size-small"><p><time dateTime="2021-02-02T12:44:42.000Z">2021-02-02</time></p><p class="title is-6"><a class="link-muted" href="/2021/02/02/%E7%82%89%E8%BE%B9%E6%BC%AB%E8%AF%9D2/">炉边漫话（第二期）</a></p><p class="is-uppercase"><a class="link-muted" href="/categories/%E7%9F%A5%E4%B9%8E%E5%9B%9E%E7%AD%94/">知乎回答</a></p></div></article><article class="media"><div class="media-content size-small"><p><time dateTime="2020-11-18T10:41:02.000Z">2020-11-18</time></p><p class="title is-6"><a class="link-muted" href="/2020/11/18/HS_hof/">冠军大厅——传说套牌展览</a></p><p class="is-uppercase"><a class="link-muted" href="/categories/%E5%8E%9F%E5%88%9B%E6%96%87%E7%AB%A0/">原创文章</a></p></div></article><article class="media"><div class="media-content size-small"><p><time dateTime="2020-09-02T08:30:37.000Z">2020-09-02</time></p><p class="title is-6"><a class="link-muted" href="/2020/09/02/HGSS/">《精灵宝可梦 心金》增强版蓝本</a></p><p class="is-uppercase"><a class="link-muted" href="/categories/%E5%8E%9F%E5%88%9B%E6%96%87%E7%AB%A0/">原创文章</a></p></div></article></div></div><div class="card widget"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile is-marginless" href="/archives/2021/04/"><span class="level-start"><span class="level-item">四月 2021</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2021/02/"><span class="level-start"><span class="level-item">二月 2021</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2020/11/"><span class="level-start"><span class="level-item">十一月 2020</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2020/09/"><span class="level-start"><span class="level-item">九月 2020</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2020/08/"><span class="level-start"><span class="level-item">八月 2020</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2020/07/"><span class="level-start"><span class="level-item">七月 2020</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2020/06/"><span class="level-start"><span class="level-item">六月 2020</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2020/04/"><span class="level-start"><span class="level-item">四月 2020</span></span><span class="level-end"><span class="level-item tag">6</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2020/03/"><span class="level-start"><span class="level-item">三月 2020</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2020/02/"><span class="level-start"><span class="level-item">二月 2020</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2019/12/"><span class="level-start"><span class="level-item">十二月 2019</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2019/11/"><span class="level-start"><span class="level-item">十一月 2019</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2019/10/"><span class="level-start"><span class="level-item">十月 2019</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2019/08/"><span class="level-start"><span class="level-item">八月 2019</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2019/06/"><span class="level-start"><span class="level-item">六月 2019</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2019/05/"><span class="level-start"><span class="level-item">五月 2019</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2019/04/"><span class="level-start"><span class="level-item">四月 2019</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2019/03/"><span class="level-start"><span class="level-item">三月 2019</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2018/08/"><span class="level-start"><span class="level-item">八月 2018</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2018/07/"><span class="level-start"><span class="level-item">七月 2018</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2018/01/"><span class="level-start"><span class="level-item">一月 2018</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2017/12/"><span class="level-start"><span class="level-item">十二月 2017</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2017/09/"><span class="level-start"><span class="level-item">九月 2017</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile is-marginless" href="/archives/2017/08/"><span class="level-start"><span class="level-item">八月 2017</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li></ul></div></div></div><div class="column-right-shadow is-hidden-widescreen is-sticky"></div></div><div class="column column-right is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only order-3 is-sticky"><div class="card widget" id="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">目录</h3><ul class="menu-list"><li><a class="is-flex" href="#题设条件"><span class="mr-2">1</span><span>题设条件</span></a></li><li><a class="is-flex" href="#求解运动方程"><span class="mr-2">2</span><span>求解运动方程</span></a></li><li><a class="is-flex" href="#杆件结构参数"><span class="mr-2">3</span><span>杆件结构参数</span></a></li><li><a class="is-flex" href="#SimMechanics仿真模块"><span class="mr-2">4</span><span>SimMechanics仿真模块</span></a></li><li><a class="is-flex" href="#运动仿真结果"><span class="mr-2">5</span><span>运动仿真结果</span></a></li><li><a class="is-flex" href="#后记"><span class="mr-2">6</span><span>后记</span></a></li></ul></div></div></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.svg" alt="Xcellerate+" height="28"></a><p class="size-small"><span>&copy; 2021 Yinhao Zheng</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script>moment.locale("zh-CN");</script><script>var IcarusThemeSettings = {
+            site: {
+                url: 'x-plus.xyz',
+                external_link: {"enable":true,"exclude":[]}
+            },
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="/js/back_to_top.js" defer></script><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><!--!--><script src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="/js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script></body></html>
